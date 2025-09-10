@@ -28,7 +28,7 @@ const products: Product[] = [
   { id: 'p10', title: 'Tablet', category: 'Electronics', price: 499, rating: 4.7, image: IMAGES.products.tablet },
 ];
 
-export const ShopPage: React.FC = () => {
+const ShopPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
