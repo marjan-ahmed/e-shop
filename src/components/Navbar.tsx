@@ -2,8 +2,19 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@/context/StoreContext";
-import { Book, Menu, Sunset, Trees, Zap, ShoppingCart, Heart, User, Search, X } from "lucide-react";
-import { formatCurrency } from '@/lib/utils';
+import {
+  Book,
+  Menu,
+  Sunset,
+  Trees,
+  Zap,
+  ShoppingCart,
+  Heart,
+  User,
+  Search,
+  X,
+} from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 import {
   Accordion,
@@ -27,6 +38,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import Link from "next/link";
 
 interface MenuItem {
   title: string;
@@ -132,19 +144,16 @@ const Navbar1 = ({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Light theme only — no dark mode toggling
-
-  // Global keyboard shortcut: Ctrl/Cmd + K focuses search
+  // Ctrl/Cmd + K → search
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      const isModifier = e.ctrlKey || e.metaKey; // Windows/Linux vs Mac
+      const isModifier = e.ctrlKey || e.metaKey;
       if (!isModifier) return;
-      if (e.key.toLowerCase() === 'k') {
+      if (e.key.toLowerCase() === "k") {
         e.preventDefault();
-        const isMobile = window.innerWidth < 768; // md breakpoint
+        const isMobile = window.innerWidth < 768;
         if (isMobile) {
           setMobileSearchOpen(true);
-          // Delay focus until animation expands
           requestAnimationFrame(() => {
             setTimeout(() => mobileSearchRef.current?.focus(), 60);
           });
@@ -153,8 +162,8 @@ const Navbar1 = ({
         }
       }
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
   }, []);
 
   const store = (() => {
@@ -166,42 +175,48 @@ const Navbar1 = ({
   })();
 
   return (
-    <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "backdrop-blur-md" : ""}`}
-      data-scrolled={scrolled}
-    >
-      {/* TOP BAR (desktop >= lg) */}
-      <div className="hidden lg:block bg-neutral-50/90 dark:bg-neutral-900/90 border-b border-neutral-200 dark:border-neutral-800">
-      <div className="max-w-7xl mx-auto px-6 h-10 flex items-center text-xs font-medium text-neutral-600">
+    <header data-scrolled={scrolled}>
+      {/* TOP BAR */}
+      <div className="hidden lg:block border-b border-neutral-200 bg-neutral-100">
+        <div className="max-w-7xl mx-auto px-6 h-10 flex items-center text-xs font-medium text-neutral-700">
           <div className="flex items-center gap-6 flex-1">
-              <span className="hidden xl:inline-flex items-center gap-1.5 text-indigo-600 font-semibold">
+            <span className="hidden xl:inline-flex items-center gap-1.5 text-[#652D90] font-semibold">
               <Zap className="size-3.5" /> Free shipping over {formatCurrency(99)}
             </span>
-            <span className="inline-flex items-center gap-1"><Sunset className="size-3.5" /> 24/7 Support</span>
-            <span className="inline-flex items-center gap-1"><Book className="size-3.5" /> Blog</span>
+            <span className="inline-flex items-center gap-1">
+              <Sunset className="size-3.5" /> 24/7 Support
+            </span>
           </div>
-            <div className="flex items-center gap-4">
-            <button className="px-2 py-1 rounded-md hover:bg-neutral-200/70 transition">EN</button>
-            <button className="px-2 py-1 rounded-md hover:bg-neutral-200/70 transition">PKR</button>
+          <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Button asChild variant="outline" size="sm" className="h-7 px-3 hidden xl:inline-flex">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="h-7 px-3 hidden xl:inline-flex"
+              >
                 <a href={auth.login.url}>{auth.login.title}</a>
               </Button>
               <Button asChild size="sm" className="h-7 px-3 hidden xl:inline-flex">
                 <a href={auth.signup.url}>{auth.signup.title}</a>
               </Button>
-              {/* light-only theme: removed theme toggle */}
             </div>
           </div>
         </div>
       </div>
 
-      {/* MAIN NAV BAR */}
-      <div className={`relative border-b border-neutral-200 dark:border-neutral-800 ${scrolled ? "shadow-sm bg-white/80 dark:bg-neutral-900/80 backdrop-blur" : "bg-white dark:bg-neutral-900"}`}>
+      {/* NAVBAR */}
+      <div
+        className={`sticky top-0 z-50 transition-all duration-300 border-b border-neutral-200 ${
+          scrolled
+            ? "shadow-sm bg-[#652D90]/90 backdrop-blur text-white"
+            : "bg-[#652D90] text-white"
+        }`}
+      >
         <div className="w-full max-w-7xl mx-auto px-4 lg:px-6 flex items-center gap-4 min-h-[70px]">
-          {/* Left: Logo + Desktop Menu */}
+          {/* Logo + Menu */}
           <div className="flex items-center gap-6 flex-shrink-0">
-            <a href={logo.url} className="flex items-center gap-2 group">
+            <a href={logo.url} className="flex items-center gap-2">
               <img src={logo.src} className="max-h-8 rounded-md" alt={logo.alt} />
             </a>
             <div className="hidden xl:flex items-center">
@@ -213,17 +228,21 @@ const Navbar1 = ({
             </div>
           </div>
 
-          {/* Center: Search (desktop) */}
+          {/* Search (desktop) */}
           <div className="hidden md:flex flex-1 min-w-[260px]">
             <SearchBar innerRef={mainSearchRef} />
           </div>
 
-          {/* Right: Icons (desktop) */}
+          {/* Right icons */}
           <div className="hidden lg:flex items-center gap-3 ml-auto">
             <IconLink href="/cart" label="Cart" badge={store ? store.cartCount : 0}>
               <ShoppingCart className="size-5" />
             </IconLink>
-            <IconLink href="/wishlist" label="Wishlist" badge={store ? store.favorites.length : 0}>
+            <IconLink
+              href="/wishlist"
+              label="Wishlist"
+              badge={store ? store.favorites.length : 0}
+            >
               <Heart className="size-5" />
             </IconLink>
             <IconLink href="/profile" label="Account">
@@ -231,7 +250,7 @@ const Navbar1 = ({
             </IconLink>
           </div>
 
-          {/* Mobile controls: group search toggle + menu to the right */}
+          {/* Mobile */}
           <div className="flex items-center gap-2 ml-auto md:hidden">
             <Button
               variant="ghost"
@@ -258,8 +277,11 @@ const Navbar1 = ({
                   </SheetTitle>
                 </SheetHeader>
                 <div className="mt-6 space-y-6">
-                  {/* <div className="md:hidden"><SearchBar compact /></div> */}
-                  <Accordion type="single" collapsible className="flex w-full flex-col gap-4">
+                  <Accordion
+                    type="single"
+                    collapsible
+                    className="flex w-full flex-col gap-4"
+                  >
                     {menu.map((item) => renderMobileMenuItem(item))}
                   </Accordion>
                   <div className="flex gap-3 pt-2">
@@ -274,7 +296,11 @@ const Navbar1 = ({
                     <IconLink href="/cart" label="Cart" badge={store ? store.cartCount : 0}>
                       <ShoppingCart className="size-5" />
                     </IconLink>
-                    <IconLink href="/wishlist" label="Wishlist" badge={store ? store.favorites.length : 0}>
+                    <IconLink
+                      href="/wishlist"
+                      label="Wishlist"
+                      badge={store ? store.favorites.length : 0}
+                    >
                       <Heart className="size-5" />
                     </IconLink>
                     <IconLink href="/profile" label="Account">
@@ -287,9 +313,11 @@ const Navbar1 = ({
           </div>
         </div>
 
-        {/* Mobile expanding search bar */}
+        {/* Mobile expanding search */}
         <div
-          className={`md:hidden px-4 pb-3 transition-[height,opacity] duration-300 overflow-hidden ${mobileSearchOpen ? "h-16 opacity-100" : "h-0 opacity-0"}`}
+          className={`md:hidden px-4 pb-3 transition-[height,opacity] duration-300 overflow-hidden ${
+            mobileSearchOpen ? "h-16 opacity-100" : "h-0 opacity-0"
+          }`}
         >
           <SearchBar autoFocus innerRef={mobileSearchRef} />
         </div>
@@ -298,7 +326,7 @@ const Navbar1 = ({
   );
 };
 
-// Reusable icon link with optional badge
+// Reusable Icon Link
 const IconLink = ({
   href,
   label,
@@ -313,51 +341,59 @@ const IconLink = ({
   <a
     href={href}
     aria-label={label}
-    className="relative p-2 rounded-full text-neutral-600 dark:text-neutral-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+    className="relative p-2 rounded-full text-white hover:bg-[#7d41a5] transition"
   >
     {children}
     {badge != null && badge > 0 && (
-      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-semibold shadow ring-2 ring-white dark:ring-neutral-900">
+      <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-[#652D90] text-white text-[10px] font-semibold shadow ring-2 ring-white">
         {badge}
       </span>
     )}
   </a>
 );
 
-// Search bar component
-interface SearchBarProps { compact?: boolean; autoFocus?: boolean; innerRef?: React.RefObject<HTMLInputElement | null>; }
+// Search Bar
+interface SearchBarProps {
+  compact?: boolean;
+  autoFocus?: boolean;
+  innerRef?: React.RefObject<HTMLInputElement | null>;
+}
 const SearchBar = ({ compact = false, autoFocus = false, innerRef }: SearchBarProps) => {
   return (
     <div className={`w-full group relative ${compact ? "" : "max-w-xl"}`}>
-      <div className="relative flex items-center h-11 rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-50/80 dark:bg-neutral-800/70 backdrop-blur px-4 shadow-sm focus-within:border-indigo-500 transition">
+      <div className="relative flex items-center h-11 rounded-full border border-neutral-200 bg-neutral-50/80 backdrop-blur px-4 shadow-sm focus-within:border-[#652D90] transition">
         <Search className="size-4 text-neutral-400" />
         <input
           type="text"
           placeholder="Search products, brands, categories..."
           autoFocus={autoFocus}
           ref={innerRef as any}
-          className="bg-transparent flex-1 px-3 text-sm focus:outline-none placeholder:text-neutral-400 text-neutral-700 dark:text-neutral-100"
+          className="bg-transparent flex-1 px-3 text-sm focus:outline-none placeholder:text-neutral-400 text-neutral-700"
           aria-label="Search products"
         />
-  <kbd className="hidden md:inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200/70 text-neutral-600">CTRL + K</kbd>
+        <kbd className="hidden md:inline-block text-[10px] font-medium px-1.5 py-0.5 rounded bg-neutral-200/70 text-neutral-600">
+          CTRL + K
+        </kbd>
       </div>
-      <div className="pointer-events-none absolute inset-0 rounded-full ring-0 group-focus-within:ring-4 ring-indigo-500/20 transition" />
+      <div className="pointer-events-none absolute inset-0 rounded-full ring-0 group-focus-within:ring-4 ring-[#652D90]/20 transition" />
     </div>
   );
 };
 
+// Menu Items
 const renderMenuItem = (item: MenuItem) => {
   if (item.items) {
     return (
       <NavigationMenuItem key={item.title}>
         <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground">
-          {item.items.map((subItem) => (
-            <NavigationMenuLink asChild key={subItem.title} className="w-80">
-              <SubMenuLink item={subItem} />
-            </NavigationMenuLink>
-          ))}
-        </NavigationMenuContent>
+<NavigationMenuContent className="bg-white p-2 text-black shadow-lg rounded-md">
+  {item.items.map((subItem) => (
+    <NavigationMenuLink asChild key={subItem.title} className="w-80">
+      <SubMenuLink item={subItem} />
+    </NavigationMenuLink>
+  ))}
+</NavigationMenuContent>
+
       </NavigationMenuItem>
     );
   }
@@ -366,7 +402,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="hover:bg-muted hover:text-accent-foreground inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors"
+        className="inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white hover:bg-[#7d41a5] transition-colors"
       >
         {item.title}
       </NavigationMenuLink>
@@ -399,21 +435,20 @@ const renderMobileMenuItem = (item: MenuItem) => {
 
 const SubMenuLink = ({ item }: { item: MenuItem }) => {
   return (
-    <a
-      className="hover:bg-muted hover:text-accent-foreground flex min-w-80 select-none flex-row gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors"
+    <Link
+      className="flex min-w-80 select-none flex-row gap-4 rounded-md p-3 leading-none no-underline outline-none text-black hover:bg-neutral-100 transition"
       href={item.url}
     >
-      <div className="text-foreground">{item.icon}</div>
+      <div className="text-[#652D90]">{item.icon}</div>
       <div>
         <div className="text-sm font-semibold">{item.title}</div>
         {item.description && (
-          <p className="text-muted-foreground text-sm leading-snug">
-            {item.description}
-          </p>
+          <p className="text-sm leading-snug text-neutral-500">{item.description}</p>
         )}
       </div>
-    </a>
-  );
-};
+    </Link>
+  )
+}
+
 
 export { Navbar1 };
